@@ -21846,7 +21846,6 @@ var Bar = React.createClass({
 	},
 	render: function render() {
 		var navbarItemChildrenFound = false;
-
 		var children = React.Children.map(this.props.children, function (child) {
 			if (child.type === BarItem) {
 				navbarItemChildrenFound = true;
@@ -21937,6 +21936,8 @@ var SimpleInpagenav = React.createClass({
 		}).bind(this));
 	},
 	render: function render() {
+		console.log(this.getOptions());
+
 		var sectionChildrenFound = false;
 		var children = React.Children.map(this.props.children, function (child) {
 			if (child.type === Section) {
@@ -21974,7 +21975,7 @@ var SimpleInpagenav = React.createClass({
 	},
 	onItemClick: function onItemClick(target) {
 		this.shouldReactOnScroll = false;
-		this.scrollTo(this.getSectionElement(target), this.props.options.scrollTo);
+		this.scrollTo(this.getSectionElement(target), this.getOptions().scrollTo);
 		this.updatesLocationHash(target);
 		this.setState({ currentTarget: target });
 	},
@@ -22025,9 +22026,9 @@ var SimpleInpagenav = React.createClass({
 	},
 	isTheVisibleArea: function isTheVisibleArea(pos) {
 		var windowPos = this.$window.scrollTop();
-		var windowHeight = Math.round(this.$window.height() * this.props.options.scrollThreshold);
+		var windowHeight = Math.round(this.$window.height() * this.getOptions().scrollThreshold);
 
-		return pos - windowHeight < windowPos + this.props.options.scrollOffset;
+		return pos - windowHeight < windowPos + this.getOptions().scrollOffset;
 	},
 	$window: $(window),
 	sections: {},
@@ -22044,6 +22045,9 @@ var SimpleInpagenav = React.createClass({
 			throw 'Target for a section must be unique!';
 		}
 		this.sections[target] = this.getSectionPos(id);
+	},
+	getOptions: function getOptions() {
+		return _.merge({}, CONSTANTS.DEFAULT_OPTIONS, this.props.options);
 	}
 });
 
