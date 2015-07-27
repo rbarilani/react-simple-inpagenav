@@ -130,18 +130,29 @@ var SimpleInpagenav = React.createClass({
 	componentDidMount: function () {
 		// activate our custom "debounced" scroll event
 		this.debouncedScroll();
-		this.updatesCurrentTarget();
+		// updates options
+		this.options = _.merge({}, this.options, this.props.options || {});
+		// scrollTo target if hash match an existent section
+		if(this.hasUsableLocation()) {
+			this.scrollTo(this.getSectionElement(this.getTargetFromLocation()), this.getOptions().scrollTo);
+		}else{
+			// updates state with current visible target
+			this.updatesCurrentTarget();
+		}
+		// listen our custom debounced event
 		this.$window.on(CONSTANTS.DEBOUNCED_SCROLL_EVENT, function () {
 			if(this.shouldReactOnScroll) {
 				var target = this.getCurrentSectionTarget();
-				this.updatesLocationHash(target);
+				this.updatesLocation(target);
 				this.updatesCurrentTarget(target);
 			}
 		}.bind(this));
+		// listen resize an adjust sections positions
+		this.$window.on('resize', function () {
+			this.updatesSectionPositions();
+		}.bind(this));
 	},
 	render: function () {
-		console.log(this.getOptions());
-
 		var sectionChildrenFound = false;
 		var children = React.Children.map(this.props.children, function (child) {
 			if (child.type === Section) {
@@ -168,6 +179,9 @@ var SimpleInpagenav = React.createClass({
 		);
 	},
 	shouldReactOnScroll: true,
+	$window: $(window),
+	sections: {},
+	options: _.merge({}, CONSTANTS.DEFAULT_OPTIONS),
 	updatesCurrentTarget: function (target) {
 		this.setState({currentTarget: target || this.getCurrentSectionTarget() });
 	},
@@ -180,7 +194,7 @@ var SimpleInpagenav = React.createClass({
 	onItemClick: function (target) {
 		this.shouldReactOnScroll = false;
 		this.scrollTo(this.getSectionElement(target), this.getOptions().scrollTo);
-		this.updatesLocationHash(target);
+		this.updatesLocation(target);
 		this.setState({currentTarget: target});
 	},
 	getCurrentSectionTarget: function () {
@@ -211,8 +225,15 @@ var SimpleInpagenav = React.createClass({
 		}
 		return returnValue;
 	},
-	updatesLocationHash: function (target) {
+	updatesLocation: function (target) {
 		window.location.hash = '#' + target;
+	},
+	hasUsableLocation: function () {
+		var target = this.getTargetFromLocation();
+		return this.sections[target] ? true : false;
+	},
+	getTargetFromLocation: function() {
+		return window.location.hash ? window.location.hash.substr(1) : null;
 	},
 	debouncedScroll: function () {
 		var scrollTimer;
@@ -232,12 +253,12 @@ var SimpleInpagenav = React.createClass({
 
 		return (pos - windowHeight) < ( windowPos + this.getOptions().scrollOffset);
 	},
-	$window: $(window),
-	sections: {},
 	getSectionElement: function (target) {
-		return $('#' + target + CONSTANTS.SECTION_ID_SUFFIX);
+		return $('#' + this.getSectionId(target));
 	},
-
+	getSectionId: function (target) {
+		return target + CONSTANTS.SECTION_ID_SUFFIX;
+	},
 	getSectionPos: function (id) {
 		var $section = $('#' + id);
 		return Math.round($section.offset().top);
@@ -248,8 +269,15 @@ var SimpleInpagenav = React.createClass({
 		}
 		this.sections[target] = this.getSectionPos(id);
 	},
+	updatesSectionPositions: function () {
+		for(var target in this.sections) {
+			if (this.sections.hasOwnProperty(target)) {
+				this.sections[target] = this.getSectionPos(this.getSectionId(target));
+			}
+		}
+	},
 	getOptions: function () {
-		return _.merge({}, CONSTANTS.DEFAULT_OPTIONS, this.props.options);
+		return this.options;
 	}
 });
 
