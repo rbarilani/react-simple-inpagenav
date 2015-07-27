@@ -1,0 +1,48 @@
+{
+  "name": "react-simple-inpagenav",
+  "version": "0.0.0",
+  "description": "SimpleInpagenav",
+  "main": "lib/SimpleInpagenav.js",
+  "author": "Ruben Barilani",
+  "homepage": "https://github.com/zalando/react-simple-inpagenav",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zalando/react-simple-inpagenav.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zalando/react-simple-inpagenav/issues"
+  },
+  "dependencies": {
+    "classnames": "^2.1.2",
+    "jquery": "^2.1.4",
+    "jquery.scrollto": "^2.1.1",
+    "lodash": "^3.10.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^3.1.14",
+    "eslint": "^0.22.1",
+    "eslint-plugin-react": "^2.5.0",
+    "gulp": "^3.9.0",
+    "react": ">=0.13.3",
+    "react-component-gulp-tasks": "^0.7.0"
+  },
+  "peerDependencies": {
+    "react": ">=0.13.3"
+  },
+  "browserify-shim": {
+    "react": "global:React"
+  },
+  "scripts": {
+    "build": "gulp clean && NODE_ENV=production gulp build",
+    "examples": "gulp dev:server",
+    "lint": "eslint ./src; true",
+    "publish:site": "gulp publish:examples",
+    "release": "gulp release",
+    "start": "gulp dev",
+    "test": "echo \"no tests yet\" && exit 0"
+  },
+  "keywords": [
+    "react",
+    "react-component"
+  ]
+}
