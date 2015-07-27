@@ -6,6 +6,9 @@ var $scrollTo = require('jquery.scrollto');
 var CONSTANTS = {
 	SECTION_ID_SUFFIX: '__simple-inpagenav',
 	DEBOUNCED_SCROLL_EVENT: 'simple-inpagenav.scroll',
+	SCROLL_EVENT: 'scroll.simpleinapgenav',
+	LOAD_EVENT: 'load.simpleinpagenav',
+	RESIZE_EVENT: 'resize.simpleinpagenav',
 	DEBOUNCED_SCROLL_EVENT_DELAY: 300,
 	DEFAULT_OPTIONS: {
 		scrollThreshold: 0.4,
@@ -130,7 +133,7 @@ var SimpleInpagenav = React.createClass({
 	componentDidMount: function () {
 		// wait for window load, because we have to rely on the top position of a section.
 		// if we don't wait for images, etc. we end up with wrong values
-		this.$window.on('load', function () {
+		this.$window.on(CONSTANTS.LOAD_EVENT, function () {
 			// activate our custom "debounced" scroll event
 			this.debouncedScroll();
 			// updates options
@@ -151,10 +154,17 @@ var SimpleInpagenav = React.createClass({
 				}
 			}.bind(this));
 			// listen resize an adjust sections positions
-			this.$window.on('resize', function () {
+			this.$window.on(CONSTANTS.RESIZE_EVENT, function () {
 				this.updatesSectionPositions();
 			}.bind(this));
 		}.bind(this));
+	},
+	componentWillUnmount: function () {
+		// unbind events
+		this.$window.off(CONSTANTS.LOAD_EVENT);
+		this.$window.off(CONSTANTS.RESIZE_EVENT);
+		this.$window.off(CONSTANTS.SCROLL_EVENT);
+		this.$window.off(CONSTANTS.DEBOUNCED_SCROLL_EVENT);
 	},
 	render: function () {
 		var sectionChildrenFound = false;
@@ -241,7 +251,7 @@ var SimpleInpagenav = React.createClass({
 	},
 	debouncedScroll: function () {
 		var scrollTimer;
-		this.$window.on('scroll', function(e) {
+		this.$window.on(CONSTANTS.SCROLL_EVENT, function(e) {
 			if (scrollTimer) { clearTimeout(scrollTimer); }
 			scrollTimer = setTimeout(function() {
 				this.$window.trigger(CONSTANTS.DEBOUNCED_SCROLL_EVENT, { scrollEvent: e });
