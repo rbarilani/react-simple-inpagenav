@@ -1,7 +1,6 @@
-# SimpleInpagenav
+# SimpleInpagenav (work in progress)
 
-__COMPONENT DESCRIPTION GOES HERE__
-
+Simple "inpage navigation" React component.
 
 ## Demo & Examples
 
