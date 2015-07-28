@@ -30,7 +30,10 @@
     "react": ">=0.13.3"
   },
   "browserify-shim": {
-    "react": "global:React"
+    "react": "global:React",
+    "lodash": "global:_",
+    "jquery": "global:$",
+    "jquery.scrollto": "global:$.scrollTo"
   },
   "scripts": {
     "build": "gulp clean && NODE_ENV=production gulp build",
