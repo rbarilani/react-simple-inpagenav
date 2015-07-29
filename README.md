@@ -1,4 +1,4 @@
-# SimpleInpagenav (work in progress)
+# SimpleInpagenav
 
 Simple "inpage navigation" React component.
 
