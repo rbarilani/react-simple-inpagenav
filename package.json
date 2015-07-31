@@ -15,7 +15,6 @@
   "dependencies": {
     "classnames": "^2.1.2",
     "jquery": "^2.1.4",
-    "jquery.scrollto": "^2.1.1",
     "lodash": "^3.10.0"
   },
   "devDependencies": {
@@ -32,8 +31,7 @@
   "browserify-shim": {
     "react": "global:React",
     "lodash": "global:_",
-    "jquery": "global:$",
-    "jquery.scrollto": "global:$.scrollTo"
+    "jquery": "global:$"
   },
   "scripts": {
     "build": "gulp clean && NODE_ENV=production gulp build",

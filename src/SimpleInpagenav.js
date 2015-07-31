@@ -1,7 +1,7 @@
 var React = require('react');
 var $ = require('jquery');
 var _ = require('lodash');
-var $scrollTo = require('jquery.scrollto');
+var $scrollTo = require('./ScrollTo.js');
 
 var CONSTANTS = require('./Constants');
 var BarItem = require('./BarItem');
