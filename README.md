@@ -21,7 +21,7 @@ Then open [`localhost:8000`](http://localhost:8000) in a browser.
 The easiest way to use react-simple-inpagenav is to install it with NPM and include it in your own React build process (using [Browserify](http://browserify.org), [Webpack](http://webpack.github.io/), etc).
 
 You can also use the standalone build by including `dist/react-simple-inpagenav.js` in your page. 
-If you use this, make sure you have already included global deps (React, jQuery, jQuery.scrollTo, lodash, ...), and it is available as a global variable.
+If you use this, make sure you have already included global deps (React, jQuery, and lodash), and it is available as a global variable.
 
 Add this to the dependencies section of your ```package.json``` file and then run ```npm install```:
 
