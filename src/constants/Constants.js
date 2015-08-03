@@ -1,4 +1,4 @@
-const CONSTANTS = {
+var CONSTANTS = {
     SECTION_ID_SUFFIX: '__simple-inpagenav',
     DEBOUNCED_SCROLL_EVENT: 'simple-inpagenav.scroll',
     SCROLL_EVENT: 'scroll.simpleinapgenav',

@@ -1,9 +1,9 @@
 var React = require('react');
 var $ = require('jquery');
 var _ = require('lodash');
-var $scrollTo = require('./ScrollTo.js');
 
-var CONSTANTS = require('./Constants');
+var CONSTANTS = require('../constants/Constants');
+var $scrollTo = require('../utils/scrollto.js');
 var BarItem = require('./BarItem');
 var Bar = require('./Bar');
 var Section = require('./Section');
@@ -67,7 +67,8 @@ var SimpleInpagenav = React.createClass({
                 case Section:
                     sectionChildrenFound = true;
                     return React.cloneElement(child, {
-                        registerSection: this.registerSection
+                        registerSection: this.registerSection,
+                        idSuffix: CONSTANTS.SECTION_ID_SUFFIX
                     });
                 case Bar:
                     return React.cloneElement(child, {

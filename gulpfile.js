@@ -14,6 +14,7 @@ var taskConfig = {
 
 	component: {
 		name: 'SimpleInpagenav',
+		file: 'index.js',
 		dependencies: [
 			'classnames',
 			'react',

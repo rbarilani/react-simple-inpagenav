@@ -99,74 +99,15 @@ module.exports = BarItem;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 },{}],3:[function(require,module,exports){
-'use strict';
-
-var CONSTANTS = {
-    SECTION_ID_SUFFIX: '__simple-inpagenav',
-    DEBOUNCED_SCROLL_EVENT: 'simple-inpagenav.scroll',
-    SCROLL_EVENT: 'scroll.simpleinapgenav',
-    LOAD_EVENT: 'load.simpleinpagenav',
-    RESIZE_EVENT: 'resize.simpleinpagenav',
-    DEBOUNCED_SCROLL_EVENT_DELAY: 300,
-    DEFAULT_OPTIONS: {
-        scrollThreshold: 0.4,
-        scrollOffset: 50,
-        scrollTo: {
-            duration: 300,
-            offset: -40
-        }
-    }
-};
-
-module.exports = CONSTANTS;
-
-},{}],4:[function(require,module,exports){
-(function (global){
-'use strict';
-
-var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
-var CONSTANTS = require('./Constants');
-
-/**
- *
- * Section Component
- * @type {Section}
- *
- */
-var Section = React.createClass({
-    displayName: 'Section',
-
-    propTypes: {
-        target: React.PropTypes.string.isRequired
-    },
-    componentDidMount: function componentDidMount() {
-        this.props.registerSection(this.props.target, this.getId());
-    },
-    getId: function getId() {
-        return this.props.target + CONSTANTS.SECTION_ID_SUFFIX;
-    },
-    render: function render() {
-        return React.createElement(
-            'div',
-            { className: "simple-inpagenav-section", id: this.getId() },
-            this.props.children
-        );
-    }
-});
-
-module.exports = Section;
-
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./Constants":3}],5:[function(require,module,exports){
 (function (global){
 'use strict';
 
 var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
 var $ = (typeof window !== "undefined" ? window['$'] : typeof global !== "undefined" ? global['$'] : null);
 var _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
-var $scrollTo = (typeof window !== "undefined" ? window['$']['scrollTo'] : typeof global !== "undefined" ? global['$']['scrollTo'] : null);
 
-var CONSTANTS = require('./Constants');
+var CONSTANTS = require('../constants/Constants');
+var $scrollTo = require('../utils/scrollto.js');
 var BarItem = require('./BarItem');
 var Bar = require('./Bar');
 var Section = require('./Section');
@@ -232,7 +173,8 @@ var SimpleInpagenav = React.createClass({
                 case Section:
                     sectionChildrenFound = true;
                     return React.cloneElement(child, {
-                        registerSection: this.registerSection
+                        registerSection: this.registerSection,
+                        idSuffix: CONSTANTS.SECTION_ID_SUFFIX
                     });
                 case Bar:
                     return React.cloneElement(child, {
@@ -448,5 +390,100 @@ SimpleInpagenav.BarItem = BarItem;
 module.exports = SimpleInpagenav;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./Bar":1,"./BarItem":2,"./Constants":3,"./Section":4}]},{},[5])(5)
+},{"../constants/Constants":5,"../utils/scrollto.js":7,"./Bar":1,"./BarItem":2,"./Section":4}],4:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
+
+/*
+ * Section Component
+ * @type {Section}
+ *
+ */
+var Section = React.createClass({
+    displayName: 'Section',
+
+    propTypes: {
+        target: React.PropTypes.string.isRequired
+    },
+    componentDidMount: function componentDidMount() {
+        this.props.registerSection(this.props.target, this.getId());
+    },
+    getId: function getId() {
+        return this.props.target + (this.props.idSuffix || '');
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: "simple-inpagenav-section", id: this.getId() },
+            this.props.children
+        );
+    }
+});
+
+module.exports = Section;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],5:[function(require,module,exports){
+'use strict';
+
+var CONSTANTS = {
+    SECTION_ID_SUFFIX: '__simple-inpagenav',
+    DEBOUNCED_SCROLL_EVENT: 'simple-inpagenav.scroll',
+    SCROLL_EVENT: 'scroll.simpleinapgenav',
+    LOAD_EVENT: 'load.simpleinpagenav',
+    RESIZE_EVENT: 'resize.simpleinpagenav',
+    DEBOUNCED_SCROLL_EVENT_DELAY: 300,
+    DEFAULT_OPTIONS: {
+        scrollThreshold: 0.4,
+        scrollOffset: 50,
+        scrollTo: {
+            duration: 300,
+            offset: -40
+        }
+    }
+};
+
+module.exports = CONSTANTS;
+
+},{}],6:[function(require,module,exports){
+'use strict';
+
+var Inpagenav = require('./components/Inpagenav');
+
+Inpagenav.Bar = require('./components/Bar');
+Inpagenav.BarItem = require('./components/BarItem');
+Inpagenav.Section = require('./components/Section');
+
+module.exports = Inpagenav;
+
+},{"./components/Bar":1,"./components/BarItem":2,"./components/Inpagenav":3,"./components/Section":4}],7:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var $ = (typeof window !== "undefined" ? window['$'] : typeof global !== "undefined" ? global['$'] : null);
+var _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
+
+var DEFAULT_OPTIONS = {
+    duration: 400,
+    offset: 0,
+    easing: 'swing',
+    onAfter: function onAfter() {}
+};
+
+function scrollto($toElement, options, $element) {
+
+    var opt = _.extend({}, scrollto.DEFAULT_OPTIONS, options || {});
+    var props = { scrollTop: $toElement.offset().top + options.offset };
+
+    $($element || 'html, body').animate(props, opt.duration, opt.easing, opt.onAfter);
+}
+
+scrollto.DEFAULT_OPTIONS = DEFAULT_OPTIONS;
+
+module.exports = scrollto;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}]},{},[6])(6)
 });

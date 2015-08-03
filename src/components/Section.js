@@ -1,8 +1,6 @@
 var React = require('react');
-var CONSTANTS = require('./Constants');
 
-/**
- *
+/*
  * Section Component
  * @type {Section}
  *
@@ -15,7 +13,7 @@ var Section = React.createClass({
         this.props.registerSection(this.props.target, this.getId());
     },
     getId: function () {
-        return this.props.target + CONSTANTS.SECTION_ID_SUFFIX;
+        return this.props.target + (this.props.idSuffix || '');
     },
     render: function () {
         return (
