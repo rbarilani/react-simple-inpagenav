@@ -6,9 +6,6 @@ var React = require('react');
  *
  */
 var Section = React.createClass({
-    propTypes: {
-        target: React.PropTypes.string.isRequired
-    },
     componentDidMount: function () {
         this.props.registerSection(this.props.target, this.getId());
     },

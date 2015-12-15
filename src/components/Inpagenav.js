@@ -7,6 +7,7 @@ var $scrollTo = require('../utils/scrollto.js');
 var BarItem = require('./BarItem');
 var Bar = require('./Bar');
 var Section = require('./Section');
+const queryString = require('query-string');
 
 /**
  *
@@ -15,6 +16,7 @@ var Section = require('./Section');
  *
  */
 var SimpleInpagenav = React.createClass({
+    _hashParams: {},
     getInitialState: function () {
         return {
             currentTarget: null
@@ -173,7 +175,8 @@ var SimpleInpagenav = React.createClass({
      * @param {string} target
      */
     updatesLocation: function (target) {
-        window.location.hash = '#' + target;
+        this.initHashParams(window.location.hash ? window.location.hash.substr(1) : null);
+        window.location.hash = '#' + target + (Object.keys(this._hashParams).length ? '?' + queryString.stringify(this._hashParams) : '');
     },
     /**
      * Check if we can use the location hash to scroll to a section
@@ -183,12 +186,24 @@ var SimpleInpagenav = React.createClass({
         var target = this.getTargetFromLocation();
         return this.sections[target] ? true : false;
     },
+    initHashParams: function (hash) {
+        if(!hash) {return;}
+        let match = hash.match(/\?.*$/);
+        if(match && match[0]) {
+            this._hashParams = queryString.parse(match[0]);
+        }
+    },
+    getHashParams: function () {
+      return this._hashParams;
+    },
     /**
      * Get the target string from the current window location
      * @returns {string|null}
      */
     getTargetFromLocation: function () {
-        return window.location.hash ? window.location.hash.substr(1) : null;
+        let target = window.location.hash ? window.location.hash.substr(1) : null;
+        this.initHashParams(target);
+        return target;
     },
     /**
      * Listen our custom "debounced" scroll event
