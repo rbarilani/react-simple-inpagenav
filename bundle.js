@@ -1,217 +1,5 @@
 require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 /*!
- * jQuery.scrollTo
- * Copyright (c) 2007-2015 Ariel Flesler - aflesler<a>gmail<d>com | http://flesler.blogspot.com
- * Licensed under MIT
- * http://flesler.blogspot.com/2007/10/jqueryscrollto.html
- * @projectDescription Lightweight, cross-browser and highly customizable animated scrolling with jQuery
- * @author Ariel Flesler
- * @version 2.1.1
- */
-;(function(factory) {
-	'use strict';
-	if (typeof define === 'function' && define.amd) {
-		// AMD
-		define(['jquery'], factory);
-	} else if (typeof module !== 'undefined' && module.exports) {
-		// CommonJS
-		module.exports = factory(require('jquery'));
-	} else {
-		// Global
-		factory(jQuery);
-	}
-})(function($) {
-	'use strict';
-
-	var $scrollTo = $.scrollTo = function(target, duration, settings) {
-		return $(window).scrollTo(target, duration, settings);
-	};
-
-	$scrollTo.defaults = {
-		axis:'xy',
-		duration: 0,
-		limit:true
-	};
-
-	function isWin(elem) {
-		return !elem.nodeName ||
-			$.inArray(elem.nodeName.toLowerCase(), ['iframe','#document','html','body']) !== -1;
-	}		
-
-	$.fn.scrollTo = function(target, duration, settings) {
-		if (typeof duration === 'object') {
-			settings = duration;
-			duration = 0;
-		}
-		if (typeof settings === 'function') {
-			settings = { onAfter:settings };
-		}
-		if (target === 'max') {
-			target = 9e9;
-		}
-
-		settings = $.extend({}, $scrollTo.defaults, settings);
-		// Speed is still recognized for backwards compatibility
-		duration = duration || settings.duration;
-		// Make sure the settings are given right
-		var queue = settings.queue && settings.axis.length > 1;
-		if (queue) {
-			// Let's keep the overall duration
-			duration /= 2;
-		}
-		settings.offset = both(settings.offset);
-		settings.over = both(settings.over);
-
-		return this.each(function() {
-			// Null target yields nothing, just like jQuery does
-			if (target === null) return;
-
-			var win = isWin(this),
-				elem = win ? this.contentWindow || window : this,
-				$elem = $(elem),
-				targ = target, 
-				attr = {},
-				toff;
-
-			switch (typeof targ) {
-				// A number will pass the regex
-				case 'number':
-				case 'string':
-					if (/^([+-]=?)?\d+(\.\d+)?(px|%)?$/.test(targ)) {
-						targ = both(targ);
-						// We are done
-						break;
-					}
-					// Relative/Absolute selector
-					targ = win ? $(targ) : $(targ, elem);
-					if (!targ.length) return;
-					/* falls through */
-				case 'object':
-					// DOMElement / jQuery
-					if (targ.is || targ.style) {
-						// Get the real position of the target
-						toff = (targ = $(targ)).offset();
-					}
-			}
-
-			var offset = $.isFunction(settings.offset) && settings.offset(elem, targ) || settings.offset;
-
-			$.each(settings.axis.split(''), function(i, axis) {
-				var Pos	= axis === 'x' ? 'Left' : 'Top',
-					pos = Pos.toLowerCase(),
-					key = 'scroll' + Pos,
-					prev = $elem[key](),
-					max = $scrollTo.max(elem, axis);
-
-				if (toff) {// jQuery / DOMElement
-					attr[key] = toff[pos] + (win ? 0 : prev - $elem.offset()[pos]);
-
-					// If it's a dom element, reduce the margin
-					if (settings.margin) {
-						attr[key] -= parseInt(targ.css('margin'+Pos), 10) || 0;
-						attr[key] -= parseInt(targ.css('border'+Pos+'Width'), 10) || 0;
-					}
-
-					attr[key] += offset[pos] || 0;
-
-					if (settings.over[pos]) {
-						// Scroll to a fraction of its width/height
-						attr[key] += targ[axis === 'x'?'width':'height']() * settings.over[pos];
-					}
-				} else {
-					var val = targ[pos];
-					// Handle percentage values
-					attr[key] = val.slice && val.slice(-1) === '%' ?
-						parseFloat(val) / 100 * max
-						: val;
-				}
-
-				// Number or 'number'
-				if (settings.limit && /^\d+$/.test(attr[key])) {
-					// Check the limits
-					attr[key] = attr[key] <= 0 ? 0 : Math.min(attr[key], max);
-				}
-
-				// Don't waste time animating, if there's no need.
-				if (!i && settings.axis.length > 1) {
-					if (prev === attr[key]) {
-						// No animation needed
-						attr = {};
-					} else if (queue) {
-						// Intermediate animation
-						animate(settings.onAfterFirst);
-						// Don't animate this axis again in the next iteration.
-						attr = {};
-					}
-				}
-			});
-
-			animate(settings.onAfter);
-
-			function animate(callback) {
-				var opts = $.extend({}, settings, {
-					// The queue setting conflicts with animate()
-					// Force it to always be true
-					queue: true,
-					duration: duration,
-					complete: callback && function() {
-						callback.call(elem, targ, settings);
-					}
-				});
-				$elem.animate(attr, opts);
-			}
-		});
-	};
-
-	// Max scrolling position, works on quirks mode
-	// It only fails (not too badly) on IE, quirks mode.
-	$scrollTo.max = function(elem, axis) {
-		var Dim = axis === 'x' ? 'Width' : 'Height',
-			scroll = 'scroll'+Dim;
-
-		if (!isWin(elem))
-			return elem[scroll] - $(elem)[Dim.toLowerCase()]();
-
-		var size = 'client' + Dim,
-			doc = elem.ownerDocument || elem.document,
-			html = doc.documentElement,
-			body = doc.body;
-
-		return Math.max(html[scroll], body[scroll]) - Math.min(html[size], body[size]);
-	};
-
-	function both(val) {
-		return $.isFunction(val) || $.isPlainObject(val) ? val : { top:val, left:val };
-	}
-
-	// Add special hooks so that window scroll properties can be animated
-	$.Tween.propHooks.scrollLeft = 
-	$.Tween.propHooks.scrollTop = {
-		get: function(t) {
-			return $(t.elem)[t.prop]();
-		},
-		set: function(t) {
-			var curr = this.get(t);
-			// If interrupt is true and user scrolled, stop animating
-			if (t.options.interrupt && t._last && t._last !== curr) {
-				return $(t.elem).stop();
-			}
-			var next = Math.round(t.now);
-			// Don't waste CPU
-			// Browsers don't render floating point scroll
-			if (curr !== next) {
-				$(t.elem)[t.prop](next);
-				t._last = this.get(t);
-			}
-		}
-	};
-
-	// AMD requirement
-	return $scrollTo;
-});
-
-},{"jquery":2}],2:[function(require,module,exports){
-/*!
  * jQuery JavaScript Library v2.1.4
  * http://jquery.com/
  *
@@ -9422,7 +9210,7 @@ return jQuery;
 
 }));
 
-},{}],3:[function(require,module,exports){
+},{}],2:[function(require,module,exports){
 (function (global){
 /**
  * @license
@@ -21777,7 +21565,83 @@ return jQuery;
 }.call(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],4:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
+'use strict';
+var strictUriEncode = require('strict-uri-encode');
+
+exports.extract = function (str) {
+	return str.split('?')[1] || '';
+};
+
+exports.parse = function (str) {
+	if (typeof str !== 'string') {
+		return {};
+	}
+
+	str = str.trim().replace(/^(\?|#|&)/, '');
+
+	if (!str) {
+		return {};
+	}
+
+	return str.split('&').reduce(function (ret, param) {
+		var parts = param.replace(/\+/g, ' ').split('=');
+		// Firefox (pre 40) decodes `%3D` to `=`
+		// https://github.com/sindresorhus/query-string/pull/37
+		var key = parts.shift();
+		var val = parts.length > 0 ? parts.join('=') : undefined;
+
+		key = decodeURIComponent(key);
+
+		// missing `=` should be `null`:
+		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+		val = val === undefined ? null : decodeURIComponent(val);
+
+		if (!ret.hasOwnProperty(key)) {
+			ret[key] = val;
+		} else if (Array.isArray(ret[key])) {
+			ret[key].push(val);
+		} else {
+			ret[key] = [ret[key], val];
+		}
+
+		return ret;
+	}, {});
+};
+
+exports.stringify = function (obj) {
+	return obj ? Object.keys(obj).sort().map(function (key) {
+		var val = obj[key];
+
+		if (val === undefined) {
+			return '';
+		}
+
+		if (val === null) {
+			return key;
+		}
+
+		if (Array.isArray(val)) {
+			return val.sort().map(function (val2) {
+				return strictUriEncode(key) + '=' + strictUriEncode(val2);
+			}).join('&');
+		}
+
+		return strictUriEncode(key) + '=' + strictUriEncode(val);
+	}).filter(function (x) {
+		return x.length > 0;
+	}).join('&') : '';
+};
+
+},{"strict-uri-encode":4}],4:[function(require,module,exports){
+'use strict';
+module.exports = function (str) {
+	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
+		return '%' + c.charCodeAt(0).toString(16);
+	});
+};
+
+},{}],5:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -21836,7 +21700,7 @@ var Bar = React.createClass({
 
 module.exports = Bar;
 
-},{"./BarItem":5,"react":undefined}],5:[function(require,module,exports){
+},{"./BarItem":6,"react":undefined}],6:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
@@ -21873,75 +21737,19 @@ var BarItem = React.createClass({
 
 module.exports = BarItem;
 
-},{"react":undefined}],6:[function(require,module,exports){
-'use strict';
-
-var CONSTANTS = {
-    SECTION_ID_SUFFIX: '__simple-inpagenav',
-    DEBOUNCED_SCROLL_EVENT: 'simple-inpagenav.scroll',
-    SCROLL_EVENT: 'scroll.simpleinapgenav',
-    LOAD_EVENT: 'load.simpleinpagenav',
-    RESIZE_EVENT: 'resize.simpleinpagenav',
-    DEBOUNCED_SCROLL_EVENT_DELAY: 300,
-    DEFAULT_OPTIONS: {
-        scrollThreshold: 0.4,
-        scrollOffset: 50,
-        scrollTo: {
-            duration: 300,
-            offset: -40
-        }
-    }
-};
-
-module.exports = CONSTANTS;
-
-},{}],7:[function(require,module,exports){
-'use strict';
-
-var React = require('react');
-var CONSTANTS = require('./Constants');
-
-/**
- *
- * Section Component
- * @type {Section}
- *
- */
-var Section = React.createClass({
-    displayName: 'Section',
-
-    propTypes: {
-        target: React.PropTypes.string.isRequired
-    },
-    componentDidMount: function componentDidMount() {
-        this.props.registerSection(this.props.target, this.getId());
-    },
-    getId: function getId() {
-        return this.props.target + CONSTANTS.SECTION_ID_SUFFIX;
-    },
-    render: function render() {
-        return React.createElement(
-            'div',
-            { className: "simple-inpagenav-section", id: this.getId() },
-            this.props.children
-        );
-    }
-});
-
-module.exports = Section;
-
-},{"./Constants":6,"react":undefined}],"react-simple-inpagenav":[function(require,module,exports){
+},{"react":undefined}],7:[function(require,module,exports){
 'use strict';
 
 var React = require('react');
 var $ = require('jquery');
 var _ = require('lodash');
-var $scrollTo = require('jquery.scrollto');
 
-var CONSTANTS = require('./Constants');
+var CONSTANTS = require('../constants/Constants');
+var $scrollTo = require('../utils/scrollto.js');
 var BarItem = require('./BarItem');
 var Bar = require('./Bar');
 var Section = require('./Section');
+var queryString = require('query-string');
 
 /**
  *
@@ -21952,6 +21760,7 @@ var Section = require('./Section');
 var SimpleInpagenav = React.createClass({
     displayName: 'SimpleInpagenav',
 
+    _hashParams: {},
     getInitialState: function getInitialState() {
         return {
             currentTarget: null
@@ -22004,7 +21813,8 @@ var SimpleInpagenav = React.createClass({
                 case Section:
                     sectionChildrenFound = true;
                     return React.cloneElement(child, {
-                        registerSection: this.registerSection
+                        registerSection: this.registerSection,
+                        idSuffix: CONSTANTS.SECTION_ID_SUFFIX
                     });
                 case Bar:
                     return React.cloneElement(child, {
@@ -22109,7 +21919,8 @@ var SimpleInpagenav = React.createClass({
      * @param {string} target
      */
     updatesLocation: function updatesLocation(target) {
-        window.location.hash = '#' + target;
+        this.initHashParams(window.location.hash ? window.location.hash.substr(1) : null);
+        window.location.hash = '#' + target + (Object.keys(this._hashParams).length ? '?' + queryString.stringify(this._hashParams) : '');
     },
     /**
      * Check if we can use the location hash to scroll to a section
@@ -22119,12 +21930,26 @@ var SimpleInpagenav = React.createClass({
         var target = this.getTargetFromLocation();
         return this.sections[target] ? true : false;
     },
+    initHashParams: function initHashParams(hash) {
+        if (!hash) {
+            return;
+        }
+        var match = hash.match(/\?.*$/);
+        if (match && match[0]) {
+            this._hashParams = queryString.parse(match[0]);
+        }
+    },
+    getHashParams: function getHashParams() {
+        return this._hashParams;
+    },
     /**
      * Get the target string from the current window location
      * @returns {string|null}
      */
     getTargetFromLocation: function getTargetFromLocation() {
-        return window.location.hash ? window.location.hash.substr(1) : null;
+        var target = window.location.hash ? window.location.hash.substr(1) : null;
+        this.initHashParams(target);
+        return target;
     },
     /**
      * Listen our custom "debounced" scroll event
@@ -22219,4 +22044,92 @@ SimpleInpagenav.BarItem = BarItem;
 
 module.exports = SimpleInpagenav;
 
-},{"./Bar":4,"./BarItem":5,"./Constants":6,"./Section":7,"jquery":2,"jquery.scrollto":1,"lodash":3,"react":undefined}]},{},[]);
+},{"../constants/Constants":9,"../utils/scrollto.js":10,"./Bar":5,"./BarItem":6,"./Section":8,"jquery":1,"lodash":2,"query-string":3,"react":undefined}],8:[function(require,module,exports){
+'use strict';
+
+var React = require('react');
+
+/*
+ * Section Component
+ * @type {Section}
+ *
+ */
+var Section = React.createClass({
+    displayName: 'Section',
+
+    componentDidMount: function componentDidMount() {
+        this.props.registerSection(this.props.target, this.getId());
+    },
+    getId: function getId() {
+        return this.props.target + (this.props.idSuffix || '');
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: "simple-inpagenav-section", id: this.getId() },
+            this.props.children
+        );
+    }
+});
+
+module.exports = Section;
+
+},{"react":undefined}],9:[function(require,module,exports){
+'use strict';
+
+var CONSTANTS = {
+    SECTION_ID_SUFFIX: '__simple-inpagenav',
+    DEBOUNCED_SCROLL_EVENT: 'simple-inpagenav.scroll',
+    SCROLL_EVENT: 'scroll.simpleinapgenav',
+    LOAD_EVENT: 'load.simpleinpagenav',
+    RESIZE_EVENT: 'resize.simpleinpagenav',
+    DEBOUNCED_SCROLL_EVENT_DELAY: 300,
+    DEFAULT_OPTIONS: {
+        scrollThreshold: 0.4,
+        scrollOffset: 50,
+        scrollTo: {
+            duration: 300,
+            offset: -40
+        }
+    }
+};
+
+module.exports = CONSTANTS;
+
+},{}],10:[function(require,module,exports){
+'use strict';
+
+var $ = require('jquery');
+var _ = require('lodash');
+
+var DEFAULT_OPTIONS = {
+    duration: 400,
+    offset: 0,
+    easing: 'swing',
+    onAfter: function onAfter() {}
+};
+
+function scrollto($toElement, options, $element) {
+
+    var opt = _.extend({}, scrollto.DEFAULT_OPTIONS, options || {});
+    var props = { scrollTop: $toElement.offset().top + options.offset };
+
+    $($element || 'html, body').animate(props, opt.duration, opt.easing, opt.onAfter);
+}
+
+scrollto.DEFAULT_OPTIONS = DEFAULT_OPTIONS;
+
+module.exports = scrollto;
+
+},{"jquery":1,"lodash":2}],"react-simple-inpagenav":[function(require,module,exports){
+'use strict';
+
+var Inpagenav = require('./components/Inpagenav');
+
+Inpagenav.Bar = require('./components/Bar');
+Inpagenav.BarItem = require('./components/BarItem');
+Inpagenav.Section = require('./components/Section');
+
+module.exports = Inpagenav;
+
+},{"./components/Bar":5,"./components/BarItem":6,"./components/Inpagenav":7,"./components/Section":8}]},{},[]);
