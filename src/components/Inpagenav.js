@@ -208,7 +208,11 @@ var SimpleInpagenav = React.createClass({
     getTargetFromLocation: function () {
         let target = window.location.hash ? window.location.hash.substr(1) : null;
         this.initHashParams(target);
-        target = target.replace(/\?.*$/, ''); // remove eventual query params
+
+        try{
+            target = target.replace(/\?.*$/, ''); // remove eventual query params
+        }catch(e) {}
+
         return target;
     },
     /**
