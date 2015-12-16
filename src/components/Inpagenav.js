@@ -176,7 +176,7 @@ var SimpleInpagenav = React.createClass({
      */
     updatesLocation: function (target) {
         this.initHashParams(window.location.hash ? window.location.hash.substr(1) : null);
-        window.location.hash = '#' + target + (Object.keys(this._hashParams).length ? '?' + queryString.stringify(this._hashParams) : '');
+        window.location.hash = '#' + target + (this.getHashParams(target) ? '?' + queryString.stringify(this.getHashParams(target)) : '');
     },
     /**
      * Check if we can use the location hash to scroll to a section
@@ -188,13 +188,18 @@ var SimpleInpagenav = React.createClass({
     },
     initHashParams: function (hash) {
         if(!hash) {return;}
-        let match = hash.match(/\?.*$/);
-        if(match && match[0]) {
-            this._hashParams = queryString.parse(match[0]);
+        let paramsMatch = hash.match(/\?.*$/); // get query param match
+        let targetMatch = hash.match(/^(.*)\?.*$/); // get target
+        let target = targetMatch && targetMatch.length === 2
+            && this.sections[targetMatch[1]] ? targetMatch[1] : null;
+        let params = paramsMatch && paramsMatch[0] ? queryString.parse(paramsMatch[0]) : null;
+
+        if(target && params) {
+            this._hashParams[target] = params;
         }
     },
-    getHashParams: function () {
-      return this._hashParams;
+    getHashParams: function (target) {
+      return this._hashParams[target];
     },
     /**
      * Get the target string from the current window location
