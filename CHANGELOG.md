@@ -1,3 +1,13 @@
+<a name="0.1.3"></a>
+## [0.1.3](https://github.com/zalando/react-simple-inpagenav/compare/0.1.2...v0.1.3) (2015-12-16)
+
+
+### Bug Fixes
+
+* **target:** uncaught exception, no tests no party ([f4b9589](https://github.com/zalando/react-simple-inpagenav/commit/f4b9589))
+
+
+
 <a name="0.1.2"></a>
 ## [0.1.2](https://github.com/zalando/react-simple-inpagenav/compare/0.1.1...v0.1.2) (2015-12-16)
 
