@@ -1,6 +1,6 @@
 {
   "name": "react-simple-inpagenav",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Simple 'inpage navigation' React component",
   "main": "lib/index.js",
   "author": "Ruben Barilani",

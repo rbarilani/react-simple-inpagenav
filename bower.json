@@ -1,6 +1,6 @@
 {
   "name": "react-simple-inpagenav",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "SimpleInpagenav",
   "main": "dist/react-simple-inpagenav.min.js",
   "homepage": "https://github.com/rbarilani/react-simple-inpagenav",
