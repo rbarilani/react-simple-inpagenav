@@ -25,7 +25,8 @@
     "gulp": "^3.9.0",
     "gulp-conventional-changelog": "^0.7.0",
     "react": ">=0.13.3",
-    "react-component-gulp-tasks": "^0.7.0"
+    "react-component-gulp-tasks": "^0.7.0",
+    "react-dom": "^15.1.0"
   },
   "peerDependencies": {
     "react": ">=0.13.3"

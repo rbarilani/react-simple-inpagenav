@@ -1,4 +1,4 @@
-var $ = require('jquery');
+var $ = require('jquery/dist/jquery');
 var _ = require('lodash');
 
 var DEFAULT_OPTIONS = {
@@ -8,17 +8,20 @@ var DEFAULT_OPTIONS = {
   onAfter: function () {}
 };
 
-function scrollto($toElement, options, $element) {
+function scrollto($toElement, options, timeout, $element) {
 
     var opt = _.extend({}, scrollto.DEFAULT_OPTIONS, options || {});
     var props = { scrollTop: $toElement.offset().top + options.offset };
 
-    $($element || 'html, body').animate(
-        props,
-        opt.duration,
-        opt.easing,
-        opt.onAfter
-    );
+    setTimeout(function()  {
+        $($element || 'html, body').animate(
+            props,
+            opt.duration,
+            opt.easing,
+            opt.onAfter
+        );
+    }, timeout || 0);
+
 }
 
 scrollto.DEFAULT_OPTIONS = DEFAULT_OPTIONS;

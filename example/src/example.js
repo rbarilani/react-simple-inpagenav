@@ -1,4 +1,5 @@
 var React = require('react');
+var ReactDOM = require('react-dom');
 var SimpleInpagenav = require('react-simple-inpagenav');
 
 var App = React.createClass({
@@ -59,5 +60,5 @@ var App = React.createClass({
 		);
 	}
 });
-
-React.render(<App />, document.getElementById('app'));
+console.log(React);
+ReactDOM.render(<App />, document.getElementById('app'));

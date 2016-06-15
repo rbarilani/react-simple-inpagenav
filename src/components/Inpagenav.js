@@ -36,7 +36,7 @@ var SimpleInpagenav = React.createClass({
             // scrollTo target if hash match an existent section
             if (this.hasUsableLocation()) {
                 this.updatesCurrentTarget(this.getTargetFromLocation());
-                this.scrollTo(this.getSectionElement(this.getTargetFromLocation()), this.getOptions().scrollTo);
+                this.scrollTo(this.getSectionElement(this.getTargetFromLocation()), this.getOptions().scrollTo, 1000);
             } else {
                 // updates state with current visible target
                 this.updatesCurrentTarget();
@@ -121,12 +121,13 @@ var SimpleInpagenav = React.createClass({
      * Scroll to an element with animation
      * @param {jQuery|HTMLElement} element
      * @param {object} options - scrollTo options
+     * @param {int} timeout - timeout before animating the scroll bar
      */
-    scrollTo: function (element, options) {
+    scrollTo: function (element, options, timeout) {
         options.onAfter = function () {
             this.shouldReactOnScroll = true;
         }.bind(this);
-        $scrollTo(element, options);
+        $scrollTo(element, options, timeout);
     },
     /**
      * Fired when a bar item was clicked
