@@ -32,8 +32,7 @@
   },
   "browserify-shim": {
     "react": "global:React",
-    "lodash": "global:_",
-    "jquery": "global:$"
+    "lodash": "global:_"
   },
   "scripts": {
     "build": "gulp clean && NODE_ENV=production gulp build",
