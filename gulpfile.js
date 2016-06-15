@@ -18,8 +18,7 @@ var taskConfig = {
 		file: 'index.js',
 		dependencies: [
 			'classnames',
-			'react',
-			'react/addons'
+			'react'
 		],
 		lib: 'lib'
 	},
