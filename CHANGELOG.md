@@ -1,3 +1,13 @@
+<a name="0.2.0"></a>
+# [0.2.0](https://github.com/zalando/react-simple-inpagenav/compare/0.1.3...v0.2.0) (2016-06-15)
+
+
+### Bug Fixes
+
+* **scrollto:** add 1s timeout before scrolling when load ([aa517e1](https://github.com/zalando/react-simple-inpagenav/commit/aa517e1))
+
+
+
 <a name="0.1.3"></a>
 ## [0.1.3](https://github.com/zalando/react-simple-inpagenav/compare/0.1.2...v0.1.3) (2015-12-16)
 
