@@ -4,13 +4,13 @@
   "description": "Simple 'inpage navigation' React component",
   "main": "lib/index.js",
   "author": "Ruben Barilani",
-  "homepage": "https://github.com/zalando/react-simple-inpagenav",
+  "homepage": "https://github.com/rbarilani/react-simple-inpagenav",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zalando/react-simple-inpagenav.git"
+    "url": "https://github.com/rbarilani/react-simple-inpagenav.git"
   },
   "bugs": {
-    "url": "https://github.com/zalando/react-simple-inpagenav/issues"
+    "url": "https://github.com/rbarilani/react-simple-inpagenav/issues"
   },
   "dependencies": {
     "classnames": "^2.1.2",
