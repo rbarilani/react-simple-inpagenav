@@ -1,6 +1,6 @@
 {
   "name": "@rbarilani/react-simple-inpagenav",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Simple 'inpage navigation' React component",
   "main": "lib/index.js",
   "author": "Ruben Barilani",
@@ -33,7 +33,9 @@
   },
   "browserify-shim": {
     "react": "global:React",
-    "lodash": "global:_"
+    "lodash": "global:_",
+    "jquery": "global:$",
+    "jquery/dist/jquery": "global:$"
   },
   "scripts": {
     "build": "gulp clean && NODE_ENV=production gulp build",

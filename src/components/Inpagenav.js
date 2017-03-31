@@ -1,5 +1,5 @@
 var React = require('react');
-var $ = require('jquery');
+var $ = require('jquery/dist/jquery');
 var _ = require('lodash');
 
 var CONSTANTS = require('../constants/Constants');

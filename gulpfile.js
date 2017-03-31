@@ -20,7 +20,14 @@ var taskConfig = {
 			'classnames',
 			'react'
 		],
-		lib: 'lib'
+		lib: 'lib',
+		dist: 'dist',
+		dependencies: [
+			'jquery',
+			'jquery/dist/jquery',
+			'lodash',
+			'react'
+		]
 	},
 
 	example: {

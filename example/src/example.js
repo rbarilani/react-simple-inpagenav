@@ -1,6 +1,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
-var SimpleInpagenav = require('react-simple-inpagenav');
+var SimpleInpagenav = require('@rbarilani/react-simple-inpagenav');
 
 var App = React.createClass({
 	render () {

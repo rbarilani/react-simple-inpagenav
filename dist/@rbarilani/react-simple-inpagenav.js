@@ -1,8 +1,186 @@
+(function(f){if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=f()}else if(typeof define==="function"&&define.amd){define([],f)}else{var g;if(typeof window!=="undefined"){g=window}else if(typeof global!=="undefined"){g=global}else if(typeof self!=="undefined"){g=self}else{g=this}g.SimpleInpagenav = f()}})(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+'use strict';
+var strictUriEncode = require('strict-uri-encode');
+
+exports.extract = function (str) {
+	return str.split('?')[1] || '';
+};
+
+exports.parse = function (str) {
+	if (typeof str !== 'string') {
+		return {};
+	}
+
+	str = str.trim().replace(/^(\?|#|&)/, '');
+
+	if (!str) {
+		return {};
+	}
+
+	return str.split('&').reduce(function (ret, param) {
+		var parts = param.replace(/\+/g, ' ').split('=');
+		// Firefox (pre 40) decodes `%3D` to `=`
+		// https://github.com/sindresorhus/query-string/pull/37
+		var key = parts.shift();
+		var val = parts.length > 0 ? parts.join('=') : undefined;
+
+		key = decodeURIComponent(key);
+
+		// missing `=` should be `null`:
+		// http://w3.org/TR/2012/WD-url-20120524/#collect-url-parameters
+		val = val === undefined ? null : decodeURIComponent(val);
+
+		if (!ret.hasOwnProperty(key)) {
+			ret[key] = val;
+		} else if (Array.isArray(ret[key])) {
+			ret[key].push(val);
+		} else {
+			ret[key] = [ret[key], val];
+		}
+
+		return ret;
+	}, {});
+};
+
+exports.stringify = function (obj) {
+	return obj ? Object.keys(obj).sort().map(function (key) {
+		var val = obj[key];
+
+		if (val === undefined) {
+			return '';
+		}
+
+		if (val === null) {
+			return key;
+		}
+
+		if (Array.isArray(val)) {
+			return val.slice().sort().map(function (val2) {
+				return strictUriEncode(key) + '=' + strictUriEncode(val2);
+			}).join('&');
+		}
+
+		return strictUriEncode(key) + '=' + strictUriEncode(val);
+	}).filter(function (x) {
+		return x.length > 0;
+	}).join('&') : '';
+};
+
+},{"strict-uri-encode":2}],2:[function(require,module,exports){
+'use strict';
+module.exports = function (str) {
+	return encodeURIComponent(str).replace(/[!'()*]/g, function (c) {
+		return '%' + c.charCodeAt(0).toString(16).toUpperCase();
+	});
+};
+
+},{}],3:[function(require,module,exports){
+(function (global){
 'use strict';
 
-var React = require('react');
-var $ = require('jquery/dist/jquery');
-var _ = require('lodash');
+var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
+var BarItem = require('./BarItem');
+
+/**
+ *
+ * Bar component
+ * @type {Bar}
+ *
+ */
+var Bar = React.createClass({
+    displayName: 'Bar',
+
+    componentDidMount: function componentDidMount() {
+        React.Children.forEach(this.props.children, function (child) {
+            this.registerItem(child.props.target);
+        }, this);
+    },
+    render: function render() {
+        var navbarItemChildrenFound = false;
+        var children = React.Children.map(this.props.children, function (child) {
+            if (child.type === BarItem) {
+                navbarItemChildrenFound = true;
+                return React.cloneElement(child, {
+                    currentTarget: this.props.currentTarget,
+                    onClickCallback: this.props.onItemClickCallback
+                });
+            }
+            return child;
+        }, this);
+
+        // we need at least a NavbarItem child
+        if (!navbarItemChildrenFound) {
+            throw 'A "SimpleInpagenav.Navbar" component must have at least one "SimpleInpagenav.NavbarItem" child';
+        }
+
+        return React.createElement(
+            'nav',
+            { className: 'simple-inpagenav-bar' },
+            React.createElement(
+                'ul',
+                null,
+                children
+            )
+        );
+    },
+    items: {},
+    registerItem: function registerItem(target) {
+        if (this.items[target]) {
+            throw 'Target for an "NavbarItem" must be unique!';
+        }
+        this.items[target] = target;
+    }
+});
+
+module.exports = Bar;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./BarItem":4}],4:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
+
+/**
+ *
+ * BarItem Component
+ * @type {BarItem}
+ *
+ */
+var BarItem = React.createClass({
+    displayName: 'BarItem',
+
+    propTypes: {
+        target: React.PropTypes.string.isRequired
+    },
+    render: function render() {
+        var className = this.props.currentTarget === this.props.target ? 'active' : '';
+        return React.createElement(
+            'li',
+            null,
+            React.createElement(
+                'a',
+                { href: '#' + this.props.target, className: className, onClick: this.onClick },
+                this.props.children
+            )
+        );
+    },
+    onClick: function onClick(event) {
+        event.preventDefault();
+        this.props.onClickCallback(this.props.target); // inform parent that a navbar item was clicked!
+    }
+});
+
+module.exports = BarItem;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],5:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
+var $ = (typeof window !== "undefined" ? window['$'] : typeof global !== "undefined" ? global['$'] : null);
+var _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
 
 var CONSTANTS = require('../constants/Constants');
 var $scrollTo = require('../utils/scrollto.js');
@@ -313,3 +491,101 @@ SimpleInpagenav.Bar = Bar;
 SimpleInpagenav.BarItem = BarItem;
 
 module.exports = SimpleInpagenav;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"../constants/Constants":7,"../utils/scrollto.js":9,"./Bar":3,"./BarItem":4,"./Section":6,"query-string":1}],6:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var React = (typeof window !== "undefined" ? window['React'] : typeof global !== "undefined" ? global['React'] : null);
+
+/*
+ * Section Component
+ * @type {Section}
+ *
+ */
+var Section = React.createClass({
+    displayName: 'Section',
+
+    componentDidMount: function componentDidMount() {
+        this.props.registerSection(this.props.target, this.getId());
+    },
+    getId: function getId() {
+        return this.props.target + (this.props.idSuffix || '');
+    },
+    render: function render() {
+        return React.createElement(
+            'div',
+            { className: 'simple-inpagenav-section', id: this.getId() },
+            this.props.children
+        );
+    }
+});
+
+module.exports = Section;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],7:[function(require,module,exports){
+'use strict';
+
+var CONSTANTS = {
+    SECTION_ID_SUFFIX: '__simple-inpagenav',
+    DEBOUNCED_SCROLL_EVENT: 'simple-inpagenav.scroll',
+    SCROLL_EVENT: 'scroll.simpleinapgenav',
+    LOAD_EVENT: 'load.simpleinpagenav',
+    RESIZE_EVENT: 'resize.simpleinpagenav',
+    DEBOUNCED_SCROLL_EVENT_DELAY: 300,
+    DEFAULT_OPTIONS: {
+        scrollThreshold: 0.4,
+        scrollOffset: 50,
+        scrollTo: {
+            duration: 300,
+            offset: -40
+        }
+    }
+};
+
+module.exports = CONSTANTS;
+
+},{}],8:[function(require,module,exports){
+'use strict';
+
+var Inpagenav = require('./components/Inpagenav');
+
+Inpagenav.Bar = require('./components/Bar');
+Inpagenav.BarItem = require('./components/BarItem');
+Inpagenav.Section = require('./components/Section');
+
+module.exports = Inpagenav;
+
+},{"./components/Bar":3,"./components/BarItem":4,"./components/Inpagenav":5,"./components/Section":6}],9:[function(require,module,exports){
+(function (global){
+'use strict';
+
+var $ = (typeof window !== "undefined" ? window['$'] : typeof global !== "undefined" ? global['$'] : null);
+var _ = (typeof window !== "undefined" ? window['_'] : typeof global !== "undefined" ? global['_'] : null);
+
+var DEFAULT_OPTIONS = {
+    duration: 400,
+    offset: 0,
+    easing: 'swing',
+    onAfter: function onAfter() {}
+};
+
+function scrollto($toElement, options, timeout, $element) {
+
+    var opt = _.extend({}, scrollto.DEFAULT_OPTIONS, options || {});
+    var props = { scrollTop: $toElement.offset().top + options.offset };
+
+    setTimeout(function () {
+        $($element || 'html, body').animate(props, opt.duration, opt.easing, opt.onAfter);
+    }, timeout || 0);
+}
+
+scrollto.DEFAULT_OPTIONS = DEFAULT_OPTIONS;
+
+module.exports = scrollto;
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}]},{},[8])(8)
+});
