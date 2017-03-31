@@ -1,3 +1,10 @@
+<a name="0.2.1"></a>
+## [0.2.1](https://github.com/rbarilani/react-simple-inpagenav/compare/0.2.0...0.2.1) (2017-03-31)
+
+* Move to personal account.
+* Publish to npm as `@rbarilani/react-simple-inpagenav`;
+
+
 <a name="0.2.0"></a>
 # [0.2.0](https://github.com/zalando/react-simple-inpagenav/compare/0.1.3...v0.2.0) (2016-06-15)
 
