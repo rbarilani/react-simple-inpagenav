@@ -13,7 +13,7 @@ function scrollto($toElement, options, timeout, $element) {
     var opt = _.extend({}, scrollto.DEFAULT_OPTIONS, options || {});
     var props = { scrollTop: $toElement.offset().top + options.offset };
 
-    setTimeout(function()  {
+    setTimeout(function() {
         $($element || 'html, body').animate(
             props,
             opt.duration,

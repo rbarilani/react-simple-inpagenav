@@ -188,7 +188,7 @@ var SimpleInpagenav = React.createClass({
         return this.sections[target] ? true : false;
     },
     initHashParams: function (hash) {
-        if(!hash) {return;}
+        if(!hash) { return; }
         let paramsMatch = hash.match(/\?.*$/); // get query param match
         let targetMatch = hash.match(/^(.*)\?.*$/); // get target
         let target = targetMatch && targetMatch.length === 2
@@ -210,6 +210,7 @@ var SimpleInpagenav = React.createClass({
         let target = window.location.hash ? window.location.hash.substr(1) : null;
         this.initHashParams(target);
 
+        /* eslint-disable no-empty */
         try{
             target = target.replace(/\?.*$/, ''); // remove eventual query params
         }catch(e) {}
