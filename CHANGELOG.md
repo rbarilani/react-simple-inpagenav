@@ -1,4 +1,14 @@
+<a name="0.2.2"></a>
+## [0.2.2](https://github.com/rbarilani/react-simple-inpagenav/compare/0.2.1...v0.2.2) (2018-01-25)
+
+
+### Bug Fixes
+
+* cve fix, upgrade jquery ([0fe83f6](https://github.com/rbarilani/react-simple-inpagenav/commit/0fe83f6))
+
+
 <a name="0.2.1"></a>
+
 ## [0.2.1](https://github.com/rbarilani/react-simple-inpagenav/compare/0.2.0...0.2.1) (2017-03-31)
 
 * Move to personal account.
@@ -43,7 +53,3 @@
 
 * **hash-params:** check and don't remove fake query hash params ([7617784](https://github.com/zalando/react-simple-inpagenav/commit/7617784))
 * **hasparams-target:** record the params only for related target(section) ([f8f46c1](https://github.com/zalando/react-simple-inpagenav/commit/f8f46c1))
-
-
-
-
